@@ -153,8 +153,8 @@
                     
                     finalBase64 = canvas.toDataURL('image/png').split(',')[1];
                     
-                    // Определяем цвет левого верхнего пикселя
-                    const px = ctx.getImageData(0, 0, 1, 1).data;
+                    // Хватаем пиксель в углу
+                    const px = ctx.getImageData(5, 5, 1, 1).data;
                     edgeColor = `rgb(${px[0]}, ${px[1]}, ${px[2]})`;
                     
                     const uiPreview = document.getElementById('uiPreview');
@@ -181,19 +181,23 @@
         const name = document.getElementById('nameInput').value;
 
         if(!rawUrl || !name || !finalBase64) {
-            alert("Заполни все поля и выбери иконку!");
+            alert("Заполни все поля!");
             return;
         }
 
-        // Сплэш-скрин с однотонным фоном под цвет края иконки
+        // Фикс статус-бара через мета-теги
         const splashHtml = `
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
     body, html { 
-        margin: 0; padding: 0; height: 100%; overflow: hidden; 
+        margin: 0; padding: 0; height: 100%; width: 100%;
+        overflow: hidden; 
         background-color: ${edgeColor}; 
     }
     .icon {
@@ -204,11 +208,11 @@
         background-image: url('data:image/png;base64,${finalBase64}');
         background-size: cover;
         border-radius: 28px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        box-shadow: 0 15px 45px rgba(0,0,0,0.4);
     }
 </style>
 <script>
-    setTimeout(function(){ window.location.href = "${rawUrl}"; }, 100);
+    setTimeout(function(){ window.location.href = "${rawUrl}"; }, 150);
 <\/script>
 </head>
 <body><div class="icon"></div></body>
@@ -240,7 +244,7 @@
             <key>Icon</key><data>${finalBase64}</data>
         </dict>
     </array>
-    <key>PayloadDisplayName</key><string>${name} Installer</string>
+    <key>PayloadDisplayName</key><string>${name}</string>
     <key>PayloadIdentifier</key><string>${ident}</string>
     <key>PayloadType</key><string>Configuration</string>
     <key>PayloadUUID</key><string>${pUUID}</string>
