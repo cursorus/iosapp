@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LiveContainer Pro Generator</title>
+    <title>LiveContainer Generator Pro</title>
     <style>
         body {
             background-color: #1c1c1c;
@@ -15,15 +15,6 @@
             min-height: 100vh;
             margin: 0;
             padding: 20px;
-            box-sizing: border-box;
-        }
-
-        .main-wrapper {
-            display: flex;
-            flex-direction: row;
-            gap: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
         }
 
         .container {
@@ -34,38 +25,6 @@
             max-width: 380px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.6);
             border: 1px solid #333;
-        }
-
-        /* Стиль для превью экрана */
-        .preview-phone {
-            width: 200px;
-            height: 355px;
-            background-color: #000;
-            border-radius: 20px;
-            border: 4px solid #444;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            display: none;
-        }
-
-        #splashBgPreview {
-            position: absolute;
-            width: 150%; height: 150%;
-            top: -25%; left: -25%;
-            background-size: cover;
-            filter: blur(15px) brightness(0.7);
-            transform: scale(1.1);
-        }
-
-        #splashIconPreview {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 60px; height: 60px;
-            background-size: cover;
-            border-radius: 14px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         }
 
         h2 { text-align: center; font-size: 20px; margin: 0 0 20px 0; color: #fff; }
@@ -115,47 +74,69 @@
             cursor: pointer;
             margin-top: 10px;
         }
-        button:active { opacity: 0.8; }
+
+        .preview-area {
+            display: flex;
+            align-items: center;
+            background: #1c1c1c;
+            padding: 10px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #333;
+        }
+
+        .preview-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            margin-right: 12px;
+            background-color: #333;
+            object-fit: cover;
+        }
     </style>
 </head>
 <body>
 
-<div class="main-wrapper">
-    <div class="container">
-        <h2>Generator Pro</h2>
-        
-        <div class="form-group">
-            <label>Ссылка (livecontainer://...)</label>
-            <textarea id="urlInput" placeholder="livecontainer://..."></textarea>
-        </div>
+<div class="container">
+    <h2>Generator Pro</h2>
 
-        <div class="form-group">
-            <label>Название</label>
-            <input type="text" id="nameInput" placeholder="App Name">
+    <div class="preview-area">
+        <img id="uiPreview" src="" style="display:none" class="preview-icon">
+        <div>
+            <div id="uiTitle" style="font-weight:600; font-size:14px;">Название</div>
+            <div id="uiColorBox" style="font-size:11px; color:#666;">Цвет фона: не определен</div>
         </div>
-
-        <div class="form-group">
-            <label>Иконка</label>
-            <label class="custom-file-upload">
-                <input type="file" id="fileInput" accept="image/*">
-                <span id="fileName">Выбрать PNG/JPG...</span>
-            </label>
-        </div>
-
-        <button onclick="generateProfile()">Скачать профиль</button>
+    </div>
+    
+    <div class="form-group">
+        <label>Ссылка (livecontainer://...)</label>
+        <textarea id="urlInput" placeholder="livecontainer://..."></textarea>
     </div>
 
-    <div class="preview-phone" id="previewPhone">
-        <div id="splashBgPreview"></div>
-        <div id="splashIconPreview"></div>
+    <div class="form-group">
+        <label>Название на экране</label>
+        <input type="text" id="nameInput" placeholder="GTA V">
     </div>
+
+    <div class="form-group">
+        <label>Иконка</label>
+        <label class="custom-file-upload">
+            <input type="file" id="fileInput" accept="image/*">
+            <span id="fileName">Выбрать иконку...</span>
+        </label>
+    </div>
+
+    <button onclick="generateProfile()">Скачать профиль</button>
 </div>
 
 <script>
     let finalBase64 = null;
-    let isSolidColor = false;
+    let edgeColor = "rgb(0,0,0)";
 
-    // Ресайз до 180px и анализ цвета
+    document.getElementById('nameInput').addEventListener('input', (e) => {
+        document.getElementById('uiTitle').textContent = e.target.value || 'Название';
+    });
+
     document.getElementById('fileInput').addEventListener('change', function(e) {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
@@ -169,38 +150,18 @@
                     canvas.width = 180;
                     canvas.height = 180;
                     ctx.drawImage(img, 0, 0, 180, 180);
+                    
                     finalBase64 = canvas.toDataURL('image/png').split(',')[1];
                     
-                    // Обновляем превью
-                    const dataUrl = 'data:image/png;base64,' + finalBase64;
-                    document.getElementById('previewPhone').style.display = 'block';
-                    document.getElementById('splashBgPreview').style.backgroundImage = `url(${dataUrl})`;
-                    document.getElementById('splashIconPreview').style.backgroundImage = `url(${dataUrl})`;
-
-                    // --- Логика определения однотонности (упрощенная) ---
-                    const imageData = ctx.getImageData(0, 0, 180, 180).data;
-                    let r = imageData[0], g = imageData[1], b = imageData[2];
-                    let sameColor = true;
-                    // Проверяем несколько точек по краям
-                    for (let i = 4; i < imageData.length; i += 100) {
-                        if (Math.abs(imageData[i] - r) > 10 || Math.abs(imageData[i+1] - g) > 10 || Math.abs(imageData[i+2] - b) > 10) {
-                            sameColor = false;
-                            break;
-                        }
-                    }
+                    // Определяем цвет левого верхнего пикселя
+                    const px = ctx.getImageData(0, 0, 1, 1).data;
+                    edgeColor = `rgb(${px[0]}, ${px[1]}, ${px[2]})`;
                     
-                    // Если фон однотонный, убираем blur и ставим фон
-                    if (sameColor) {
-                        isSolidColor = true;
-                        document.getElementById('splashBgPreview').style.filter = 'none';
-                        document.getElementById('splashBgPreview').style.backgroundColor = `rgb(${r},${g},${b})`;
-                        document.getElementById('splashBgPreview').style.backgroundImage = 'none';
-                    } else {
-                        isSolidColor = false;
-                        document.getElementById('splashBgPreview').style.filter = 'blur(15px) brightness(0.7)';
-                        document.getElementById('splashBgPreview').style.backgroundColor = 'transparent';
-                        document.getElementById('splashBgPreview').style.backgroundImage = `url(${dataUrl})`;
-                    }
+                    const uiPreview = document.getElementById('uiPreview');
+                    uiPreview.src = 'data:image/png;base64,' + finalBase64;
+                    uiPreview.style.display = 'block';
+                    document.getElementById('uiColorBox').textContent = "Цвет фона: " + edgeColor;
+                    document.getElementById('uiColorBox').style.color = edgeColor;
                 }
                 img.src = event.target.result;
             }
@@ -217,35 +178,23 @@
 
     function generateProfile() {
         const rawUrl = document.getElementById('urlInput').value.trim();
-        const name = nameInput.value;
+        const name = document.getElementById('nameInput').value;
 
         if(!rawUrl || !name || !finalBase64) {
-            alert("Заполните всё, включая иконку!");
+            alert("Заполни все поля и выбери иконку!");
             return;
         }
 
-        // HTML-Splash Screen с учетом типа фона
+        // Сплэш-скрин с однотонным фоном под цвет края иконки
         const splashHtml = `
 <!DOCTYPE html>
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <style>
-    body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; }
-    .bg {
-        position: absolute;
-        width: 150%; height: 150%;
-        top: -25%; left: -25%;
-        background-size: cover;
-        ${isSolidColor ? 
-            `background-image: none;` : 
-            `background-image: url('data:image/png;base64,${finalBase64}');`
-        }
-        ${isSolidColor ? 
-            `filter: none;` : 
-            `filter: blur(30px) brightness(0.7);`
-        }
-        transform: scale(1.1);
+    body, html { 
+        margin: 0; padding: 0; height: 100%; overflow: hidden; 
+        background-color: ${edgeColor}; 
     }
     .icon {
         position: absolute;
@@ -255,33 +204,22 @@
         background-image: url('data:image/png;base64,${finalBase64}');
         background-size: cover;
         border-radius: 28px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
     }
 </style>
 <script>
-    setTimeout(function(){
-        window.location.href = "${rawUrl}";
-    }, 50);
+    setTimeout(function(){ window.location.href = "${rawUrl}"; }, 100);
 <\/script>
 </head>
-<body style="${isSolidColor ? `background-color: #f0f0f0;` : `background-color: #000;` }">
-    <div class="bg" id="bg"></div>
-    <div class="icon"></div>
-    <script>
-        // Доп. логика для однотонного фона, если он не определился JS
-        if (${isSolidColor}) {
-            document.getElementById('bg').style.backgroundColor = "transparent"; // Здесь нужно реальное определение цвета, но для простоты оставляем CSS
-        }
-    <\/script>
-</body>
+<body><div class="icon"></div></body>
 </html>`;
 
         const base64Html = btoa(unescape(encodeURIComponent(splashHtml)));
         const dataUri = `data:text/html;base64,${base64Html}`;
 
-        const payloadUUID = generateUUID();
-        const contentUUID = generateUUID();
-        const identifier = "com.generator." + payloadUUID;
+        const pUUID = generateUUID();
+        const cUUID = generateUUID();
+        const ident = "com.live.launcher." + pUUID;
         
         const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -290,50 +228,31 @@
     <key>PayloadContent</key>
     <array>
         <dict>
-            <key>FullScreen</key>
-            <true/>
-            <key>IsRemovable</key>
-            <true/>
-            <key>Label</key>
-            <string>${name}</string>
-            <key>PayloadType</key>
-            <string>com.apple.webClip.managed</string>
-            <key>PayloadUUID</key>
-            <string>${contentUUID}</string>
-            <key>PayloadVersion</key>
-            <integer>1</integer>
-            <key>Precomposed</key>
-            <true/>
-            <key>URL</key>
-            <string>${dataUri}</string>
-            <key>Icon</key>
-            <data>${finalBase64}</data>
-            <key>PayloadIdentifier</key>
-            <string>${identifier}.webclip</string>
+            <key>FullScreen</key><true/>
+            <key>IsRemovable</key><true/>
+            <key>Label</key><string>${name}</string>
+            <key>PayloadType</key><string>com.apple.webClip.managed</string>
+            <key>PayloadUUID</key><string>${cUUID}</string>
+            <key>PayloadIdentifier</key><string>${ident}.clip</string>
+            <key>PayloadVersion</key><integer>1</integer>
+            <key>Precomposed</key><true/>
+            <key>URL</key><string>${dataUri}</string>
+            <key>Icon</key><data>${finalBase64}</data>
         </dict>
     </array>
-    <key>PayloadDisplayName</key>
-    <string>Install ${name}</string>
-    <key>PayloadIdentifier</key>
-    <string>${identifier}</string>
-    <key>PayloadRemovalDisallowed</key>
-    <false/>
-    <key>PayloadType</key>
-    <string>Configuration</string>
-    <key>PayloadUUID</key>
-    <string>${payloadUUID}</string>
-    <key>PayloadVersion</key>
-    <integer>1</integer>
+    <key>PayloadDisplayName</key><string>${name} Installer</string>
+    <key>PayloadIdentifier</key><string>${ident}</string>
+    <key>PayloadType</key><string>Configuration</string>
+    <key>PayloadUUID</key><string>${pUUID}</string>
+    <key>PayloadVersion</key><integer>1</integer>
 </dict>
 </plist>`;
 
         const blob = new Blob([xml], { type: 'application/x-apple-aspen-config' });
         const link = document.createElement('a');
         link.href = window.URL.createObjectURL(blob);
-        link.download = `${name.replace(/[^a-z0-9]/gi, '_')}.mobileconfig`;
-        document.body.appendChild(link);
+        link.download = `${name.replace(/\s+/g, '_')}.mobileconfig`;
         link.click();
-        document.body.removeChild(link);
     }
 </script>
 
