@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iOS WebClip Generator</title>
+    <title>WebClip Generator (Fixed)</title>
     <style>
         body {
             background-color: #1c1c1c;
-            color: #ffffff;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #e0e0e0;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -20,113 +20,142 @@
 
         .container {
             background-color: #2c2c2c;
-            padding: 30px;
-            border-radius: 16px;
+            padding: 24px;
+            border-radius: 18px;
             width: 100%;
-            max-width: 400px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-width: 380px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            border: 1px solid #333;
         }
 
-        h1 {
+        h2 {
             text-align: center;
-            font-size: 24px;
-            margin-bottom: 25px;
+            font-size: 20px;
+            margin: 0 0 20px 0;
             font-weight: 600;
+            color: #fff;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         label {
             display: block;
-            margin-bottom: 8px;
-            font-size: 14px;
-            color: #b0b0b0;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: #8e8e93;
+            font-weight: 500;
         }
 
         input[type="text"],
-        input[type="url"],
-        input[type="file"] {
+        input[type="url"] {
             width: 100%;
             padding: 12px;
-            background-color: #3a3a3a;
-            border: 1px solid #4a4a4a;
+            background-color: #1c1c1c;
+            border: 1px solid #3a3a3a;
             border-radius: 10px;
             color: white;
             font-size: 16px;
             box-sizing: border-box;
             outline: none;
-            transition: border-color 0.2s;
         }
 
         input:focus {
-            border-color: #007aff;
+            border-color: #0a84ff;
         }
 
-        /* Кастомный стиль для инпута файла */
-        input[type="file"]::file-selector-button {
-            background-color: #4a4a4a;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
-            margin-right: 10px;
+        /* Стилизация загрузки файла */
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .custom-file-upload {
+            border: 1px dashed #4a4a4a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
             cursor: pointer;
+            border-radius: 10px;
+            background-color: #1c1c1c;
+            color: #8e8e93;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .custom-file-upload:hover {
+            border-color: #666;
+            background-color: #252525;
         }
 
         button {
             width: 100%;
-            padding: 15px;
-            background-color: #007aff; /* Apple Blue */
+            padding: 16px;
+            background-color: #0a84ff;
             color: white;
             border: none;
             border-radius: 12px;
-            font-size: 16px;
+            font-size: 17px;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.2s;
             margin-top: 10px;
         }
 
-        button:hover {
-            background-color: #0056b3;
+        button:active {
+            transform: scale(0.98);
+            opacity: 0.9;
         }
 
-        .preview {
+        /* Превью */
+        .preview-box {
             display: flex;
             align-items: center;
+            background: #1c1c1c;
+            padding: 12px;
+            border-radius: 12px;
             margin-bottom: 20px;
-            padding: 10px;
-            background: #3a3a3a;
-            border-radius: 10px;
+            border: 1px solid #333;
         }
 
-        .preview img {
-            width: 60px;
-            height: 60px;
-            border-radius: 14px;
+        .app-icon {
+            width: 50px;
+            height: 50px;
+            background-color: #333;
+            border-radius: 12px;
             object-fit: cover;
-            margin-right: 15px;
-            background-color: #1c1c1c;
+            margin-right: 12px;
+            flex-shrink: 0;
         }
 
-        .preview-text h3 {
+        .app-info h3 {
+            font-size: 15px;
             margin: 0;
-            font-size: 16px;
-        }
-        
-        .preview-text p {
-            margin: 4px 0 0 0;
-            font-size: 12px;
-            color: #888;
+            color: #fff;
+            font-weight: 500;
         }
 
-        .note {
-            margin-top: 20px;
+        .app-info p {
             font-size: 12px;
+            margin: 2px 0 0 0;
             color: #666;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
+        }
+
+        .helper-text {
+            font-size: 11px;
             text-align: center;
+            color: #555;
+            margin-top: 15px;
             line-height: 1.4;
         }
     </style>
@@ -134,45 +163,93 @@
 <body>
 
 <div class="container">
-    <h1>Создать Web Clip</h1>
-    
-    <div class="form-group">
-        <label for="urlInput">Ссылка запуска (URL)</label>
-        <input type="url" id="urlInput" placeholder="https://example.com" required>
-    </div>
+    <h2>Генератор профиля</h2>
 
-    <div class="form-group">
-        <label for="appNameInput">Название приложения</label>
-        <input type="text" id="appNameInput" placeholder="Мое Приложение" required>
-    </div>
-
-    <div class="form-group">
-        <label for="profileNameInput">Название профиля (в настройках)</label>
-        <input type="text" id="profileNameInput" placeholder="Установщик WebApp" required>
-    </div>
-
-    <div class="form-group">
-        <label for="iconInput">Иконка приложения (PNG/JPG)</label>
-        <input type="file" id="iconInput" accept="image/png, image/jpeg">
-    </div>
-
-    <div class="preview" id="previewBox" style="display:none;">
-        <img id="iconPreview" src="" alt="Icon">
-        <div class="preview-text">
-            <h3 id="previewAppName">Название</h3>
-            <p id="previewUrl">url...</p>
+    <div class="preview-box">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgdmlld0JveD0iMCAwIDUwIDUwIj48cmVjdCB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IiMzMzMiIHJ4PSIxMiIvPjwvc3ZnPg==" id="previewImg" class="app-icon" alt="Icon">
+        <div class="app-info">
+            <h3 id="previewTitle">Название</h3>
+            <p id="previewUrl">example.com</p>
         </div>
     </div>
+    
+    <div class="form-group">
+        <label>Ссылка (URL)</label>
+        <input type="url" id="urlInput" placeholder="https://" value="https://">
+    </div>
 
-    <button id="generateBtn">Скачать профиль</button>
+    <div class="form-group">
+        <label>Название иконки</label>
+        <input type="text" id="nameInput" placeholder="App Name">
+    </div>
 
-    <div class="note">
-        После скачивания перейдите в <b>Настройки -> Основные -> VPN и управление устройством</b> для установки профиля.
+    <div class="form-group">
+        <label>Название профиля (для настроек)</label>
+        <input type="text" id="profileName" placeholder="Web Clip Profile" value="Установщик WebApp">
+    </div>
+
+    <div class="form-group">
+        <label>Изображение</label>
+        <label class="custom-file-upload">
+            <input type="file" id="fileInput" accept="image/*">
+            <span id="fileName">Выбрать иконку...</span>
+        </label>
+    </div>
+
+    <button onclick="generateProfile()">Скачать профиль</button>
+
+    <div class="helper-text">
+        1. Скачайте файл.<br>
+        2. Перейдите в Настройки -> Профиль загружен.<br>
+        3. Нажмите "Установить".
     </div>
 </div>
 
 <script>
-    // Генерация UUID для профиля
+    let finalBase64 = null;
+    const previewImg = document.getElementById('previewImg');
+    const nameInput = document.getElementById('nameInput');
+    const urlInput = document.getElementById('urlInput');
+    const previewTitle = document.getElementById('previewTitle');
+    const previewUrl = document.getElementById('previewUrl');
+
+    // Обновление текста в превью
+    nameInput.addEventListener('input', (e) => previewTitle.textContent = e.target.value || 'Название');
+    urlInput.addEventListener('input', (e) => previewUrl.textContent = e.target.value || 'example.com');
+
+    // Обработка картинки: РЕСАЙЗ ДО 180x180 (Важно для валидности профиля)
+    document.getElementById('fileInput').addEventListener('change', function(e) {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            document.getElementById('fileName').textContent = file.name;
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Стандарт Apple Touch Icon
+                    canvas.width = 180;
+                    canvas.height = 180;
+                    
+                    // Рисуем иконку с масштабированием
+                    ctx.drawImage(img, 0, 0, 180, 180);
+                    
+                    // Получаем оптимизированный Base64 (PNG)
+                    const dataUrl = canvas.toDataURL('image/png');
+                    previewImg.src = dataUrl;
+                    
+                    // Убираем заголовок data:image/png;base64,
+                    finalBase64 = dataUrl.split(',')[1]; 
+                }
+                img.src = event.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
     function generateUUID() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
             var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
@@ -180,52 +257,27 @@
         });
     }
 
-    const iconInput = document.getElementById('iconInput');
-    const iconPreview = document.getElementById('iconPreview');
-    const previewBox = document.getElementById('previewBox');
-    const appNameInput = document.getElementById('appNameInput');
-    const previewAppName = document.getElementById('previewAppName');
-    const urlInput = document.getElementById('urlInput');
-    const previewUrl = document.getElementById('previewUrl');
-
-    let iconBase64 = null;
-
-    // Обработка загрузки иконки для превью и конвертации
-    iconInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                iconPreview.src = event.target.result;
-                // Нам нужна чистая строка base64 без префикса data:image/...
-                iconBase64 = event.target.result.split(',')[1]; 
-                previewBox.style.display = 'flex';
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-
-    // Живое обновление превью
-    appNameInput.addEventListener('input', (e) => previewAppName.innerText = e.target.value || 'Название');
-    urlInput.addEventListener('input', (e) => previewUrl.innerText = e.target.value || 'url...');
-
-    document.getElementById('generateBtn').addEventListener('click', function() {
+    function generateProfile() {
         const url = urlInput.value;
-        const appName = appNameInput.value;
-        const profileName = document.getElementById('profileNameInput').value;
+        const name = nameInput.value;
+        const profile = document.getElementById('profileName').value;
 
-        if (!url || !appName || !profileName) {
-            alert('Пожалуйста, заполните все поля');
+        if(!url || !name) {
+            alert("Заполните ссылку и название!");
             return;
+        }
+
+        // Если иконку не выбрали, не добавляем блок Icon вообще, чтобы не было ошибки
+        let iconEntry = '';
+        if (finalBase64) {
+            iconEntry = `<key>Icon</key><data>${finalBase64}</data>`;
         }
 
         const payloadUUID = generateUUID();
         const contentUUID = generateUUID();
 
-        // XML шаблон профиля
-        // Важно: Полноэкранный режим (FullScreen = true) работает только если сайт поддерживает PWA манифест,
-        // но сам WebClip попытается убрать интерфейс браузера.
-        const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
+        // СТРОГАЯ СТРУКТУРА XML БЕЗ ЛИШНИХ ПРОБЕЛОВ В НАЧАЛЕ
+        const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
@@ -236,14 +288,12 @@
             <true/>
             <key>IsRemovable</key>
             <true/>
-            <key>Icon</key>
-            <data>${iconBase64 || ''}</data>
             <key>Label</key>
-            <string>${appName}</string>
+            <string>${name}</string>
             <key>PayloadDescription</key>
-            <string>Configures Web Clip</string>
+            <string>Web Clip</string>
             <key>PayloadDisplayName</key>
-            <string>${appName}</string>
+            <string>${name}</string>
             <key>PayloadIdentifier</key>
             <string>com.webclip.${contentUUID}</string>
             <key>PayloadType</key>
@@ -256,12 +306,13 @@
             <true/>
             <key>URL</key>
             <string>${url}</string>
+            ${iconEntry}
         </dict>
     </array>
     <key>PayloadDisplayName</key>
-    <string>${profileName}</string>
+    <string>${profile}</string>
     <key>PayloadIdentifier</key>
-    <string>com.profile.${payloadUUID}</string>
+    <string>com.generator.${payloadUUID}</string>
     <key>PayloadRemovalDisallowed</key>
     <false/>
     <key>PayloadType</key>
@@ -273,15 +324,14 @@
 </dict>
 </plist>`;
 
-        // Создание и скачивание файла
-        const blob = new Blob([xmlContent], { type: 'application/x-apple-aspen-config' });
+        const blob = new Blob([xml], { type: 'application/x-apple-aspen-config' });
         const link = document.createElement('a');
         link.href = window.URL.createObjectURL(blob);
-        link.download = `${appName.replace(/\s+/g, '_')}.mobileconfig`;
+        link.download = 'app_installer.mobileconfig';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-    });
+    }
 </script>
 
 </body>
