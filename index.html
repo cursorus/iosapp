@@ -182,7 +182,7 @@
             return;
         }
 
-        // HTML-Splash Screen (Растянутый фон + blur + иконка по центру)
+        // HTML-Splash Screen
         const splashHtml = `
 <!DOCTYPE html>
 <html>
@@ -213,7 +213,7 @@
 <script>
     setTimeout(function(){
         window.location.href = "${rawUrl}";
-    }, 50); // Минимальная задержка для отрисовки
+    }, 50);
 <\/script>
 </head>
 <body>
@@ -227,6 +227,7 @@
 
         const payloadUUID = generateUUID();
         const contentUUID = generateUUID();
+        const identifier = "com.generator." + payloadUUID;
         
         const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -253,12 +254,14 @@
             <string>${dataUri}</string>
             <key>Icon</key>
             <data>${finalBase64}</data>
+            <key>PayloadIdentifier</key>
+            <string>${identifier}.webclip</string>
         </dict>
     </array>
     <key>PayloadDisplayName</key>
     <string>Install ${name}</string>
     <key>PayloadIdentifier</key>
-    <string>com.generator.${payloadUUID}</string>
+    <string>${identifier}</string>
     <key>PayloadRemovalDisallowed</key>
     <false/>
     <key>PayloadType</key>
