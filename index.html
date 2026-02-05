@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LiveContainer Launcher Generator</title>
+    <title>LiveContainer Pro Generator</title>
     <style>
         body {
             background-color: #1c1c1c;
             color: #e0e0e0;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -28,28 +28,13 @@
             border: 1px solid #333;
         }
 
-        h2 {
-            text-align: center;
-            font-size: 20px;
-            margin: 0 0 20px 0;
-            font-weight: 600;
-            color: #fff;
-        }
+        h2 { text-align: center; font-size: 20px; margin: 0 0 20px 0; color: #fff; }
 
-        .form-group {
-            margin-bottom: 16px;
-        }
+        .form-group { margin-bottom: 16px; }
 
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-size: 13px;
-            color: #8e8e93;
-            font-weight: 500;
-        }
+        label { display: block; margin-bottom: 6px; font-size: 13px; color: #8e8e93; }
 
-        input[type="text"],
-        textarea {
+        input[type="text"], textarea {
             width: 100%;
             padding: 12px;
             background-color: #1c1c1c;
@@ -62,14 +47,9 @@
             outline: none;
         }
         
-        textarea {
-            height: 80px;
-            resize: vertical;
-        }
+        textarea { height: 70px; resize: none; }
 
-        input:focus, textarea:focus {
-            border-color: #0a84ff;
-        }
+        input:focus, textarea:focus { border-color: #0a84ff; }
 
         .custom-file-upload {
             border: 1px dashed #4a4a4a;
@@ -82,12 +62,6 @@
             background-color: #1c1c1c;
             color: #8e8e93;
             font-size: 14px;
-            transition: all 0.2s;
-        }
-
-        .custom-file-upload:hover {
-            border-color: #666;
-            background-color: #252525;
         }
         
         input[type="file"] { display: none; }
@@ -121,44 +95,40 @@
             width: 50px;
             height: 50px;
             background-color: #333;
-            border-radius: 11px; /* Стиль iOS иконки */
+            border-radius: 11px;
             object-fit: cover;
             margin-right: 12px;
-            flex-shrink: 0;
         }
-
-        .app-info h3 { font-size: 15px; margin: 0; color: #fff; }
-        .app-info p { font-size: 12px; margin: 2px 0 0 0; color: #666; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Генератор LiveContainer</h2>
+    <h2>Generator Pro</h2>
 
     <div class="preview-box">
         <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgdmlld0JveD0iMCAwIDUwIDUwIj48cmVjdCB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IiMzMzMiIHJ4PSIxMiIvPjwvc3ZnPg==" id="previewImg" class="app-icon">
         <div class="app-info">
-            <h3 id="previewTitle">App Name</h3>
-            <p>LiveContainer Shortcut</p>
+            <h3 id="previewTitle" style="margin:0; font-size:15px; color:#fff;">Название</h3>
+            <p style="margin:2px 0 0 0; font-size:12px; color:#666;">Splash Screen Mode</p>
         </div>
     </div>
     
     <div class="form-group">
         <label>Ссылка (livecontainer://...)</label>
-        <textarea id="urlInput" placeholder="Вставьте длинную ссылку livecontainer:// сюда..."></textarea>
+        <textarea id="urlInput" placeholder="livecontainer://..."></textarea>
     </div>
 
     <div class="form-group">
-        <label>Название на экране</label>
-        <input type="text" id="nameInput" placeholder="Например: GTA V">
+        <label>Название</label>
+        <input type="text" id="nameInput" placeholder="App Name">
     </div>
 
     <div class="form-group">
         <label>Иконка</label>
         <label class="custom-file-upload">
             <input type="file" id="fileInput" accept="image/*">
-            <span id="fileName">Выбрать файл...</span>
+            <span id="fileName">Выбрать PNG/JPG...</span>
         </label>
     </div>
 
@@ -171,9 +141,9 @@
     const nameInput = document.getElementById('nameInput');
     const previewTitle = document.getElementById('previewTitle');
 
-    nameInput.addEventListener('input', (e) => previewTitle.textContent = e.target.value || 'App Name');
+    nameInput.addEventListener('input', (e) => previewTitle.textContent = e.target.value || 'Название');
 
-    // Обработка иконки (обязательный ресайз до 180px для валидности)
+    // Ресайз до 180px для иконки рабочего стола
     document.getElementById('fileInput').addEventListener('change', function(e) {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
@@ -187,9 +157,8 @@
                     canvas.width = 180;
                     canvas.height = 180;
                     ctx.drawImage(img, 0, 0, 180, 180);
-                    const dataUrl = canvas.toDataURL('image/png');
-                    previewImg.src = dataUrl;
-                    finalBase64 = dataUrl.split(',')[1]; 
+                    finalBase64 = canvas.toDataURL('image/png').split(',')[1];
+                    previewImg.src = 'data:image/png;base64,' + finalBase64;
                 }
                 img.src = event.target.result;
             }
@@ -204,56 +173,60 @@
         });
     }
 
-    // Функция для экранирования XML спецсимволов (& -> &amp;)
-    function escapeXml(unsafe) {
-        return unsafe.replace(/[<>&'"]/g, function (c) {
-            switch (c) {
-                case '<': return '&lt;';
-                case '>': return '&gt;';
-                case '&': return '&amp;';
-                case '\'': return '&apos;';
-                case '"': return '&quot;';
-            }
-        });
-    }
-
     function generateProfile() {
         const rawUrl = document.getElementById('urlInput').value.trim();
         const name = nameInput.value;
 
-        if(!rawUrl || !name) {
-            alert("Заполните ссылку и название!");
+        if(!rawUrl || !name || !finalBase64) {
+            alert("Заполните всё, включая иконку!");
             return;
         }
 
-        // 1. Создаем HTML-файл обертку, который сделает редирект
-        // Мы используем window.location.href для перехода на схему приложения
-        const redirectHtml = `
+        // HTML-Splash Screen (Растянутый фон + blur + иконка по центру)
+        const splashHtml = `
+<!DOCTYPE html>
 <html>
 <head>
-<meta http-equiv="refresh" content="0;url=${rawUrl}" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<style>
+    body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; }
+    .bg {
+        position: absolute;
+        width: 150%; height: 150%;
+        top: -25%; left: -25%;
+        background-image: url('data:image/png;base64,${finalBase64}');
+        background-size: cover;
+        filter: blur(30px) brightness(0.7);
+        transform: scale(1.1);
+    }
+    .icon {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        width: 120px; height: 120px;
+        background-image: url('data:image/png;base64,${finalBase64}');
+        background-size: cover;
+        border-radius: 28px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+</style>
+<script>
+    setTimeout(function(){
+        window.location.href = "${rawUrl}";
+    }, 50); // Минимальная задержка для отрисовки
+<\/script>
 </head>
 <body>
-<script>window.location.href = "${rawUrl}";<\/script>
+    <div class="bg"></div>
+    <div class="icon"></div>
 </body>
 </html>`;
 
-        // 2. Кодируем этот HTML в Base64, чтобы вставить как Data URI
-        // btoa не поддерживает кириллицу/юникод напрямую, поэтому делаем трюк с encodeURIComponent
-        const base64Html = btoa(unescape(encodeURIComponent(redirectHtml)));
+        const base64Html = btoa(unescape(encodeURIComponent(splashHtml)));
         const dataUri = `data:text/html;base64,${base64Html}`;
 
         const payloadUUID = generateUUID();
         const contentUUID = generateUUID();
-
-        // Формируем иконку (если нет, ставим пустую, но лучше чтобы была)
-        let iconEntry = '';
-        if (finalBase64) {
-            iconEntry = `<key>Icon</key><data>${finalBase64}</data>`;
-        }
-
-        // Важно: Поле URL в профиле теперь содержит нашу data: ссылку.
-        // Она безопасна для XML, так как состоит из a-z, 0-9.
         
         const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -267,13 +240,7 @@
             <key>IsRemovable</key>
             <true/>
             <key>Label</key>
-            <string>${escapeXml(name)}</string>
-            <key>PayloadDescription</key>
-            <string>LiveContainer Launcher</string>
-            <key>PayloadDisplayName</key>
-            <string>${escapeXml(name)}</string>
-            <key>PayloadIdentifier</key>
-            <string>com.livecontainer.${contentUUID}</string>
+            <string>${name}</string>
             <key>PayloadType</key>
             <string>com.apple.webClip.managed</string>
             <key>PayloadUUID</key>
@@ -284,11 +251,12 @@
             <true/>
             <key>URL</key>
             <string>${dataUri}</string>
-            ${iconEntry}
+            <key>Icon</key>
+            <data>${finalBase64}</data>
         </dict>
     </array>
     <key>PayloadDisplayName</key>
-    <string>Install ${escapeXml(name)}</string>
+    <string>Install ${name}</string>
     <key>PayloadIdentifier</key>
     <string>com.generator.${payloadUUID}</string>
     <key>PayloadRemovalDisallowed</key>
